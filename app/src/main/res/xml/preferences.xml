@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 应用权限 -->
+    <!-- iconSpaceReserved: 是否保留图标和标题之间的间距, 因为没有图标, 所以设置为false, 否则左边距过大 -->
+    <PreferenceCategory
+        android:summary="应用正常运行不可缺少的权限"
+        android:title="应用权限"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="accessibility_permission"
+            android:summary="应用核心功能所需"
+            android:title="无障碍权限"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="overlay_permission"
+            android:summary="应用跳转功能所需"
+            android:title="悬浮窗权限"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="write_secure_settings"
+            android:summary="用于设置应用黑白页面等功能，点击查看ADB命令"
+            android:title="ADB权限"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="background_permission"
+            android:summary="在省电策略或耗电管理中设置无限制/完全允许后台行为"
+            android:title="允许后台运行"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="lock_app_permission"
+            android:summary="在最近任务中锁定，防止应用被清理"
+            android:title="锁定应用"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- 应用行为设置 -->
+    <PreferenceCategory
+        android:title="应用行为"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="hide_from_recent"
+            android:summary="建议锁定应用后开启"
+            android:title="最近任务中隐藏应用"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="enable_gray_mode_for_non_recommend_apps"
+            android:summary="在非勿扰时段，为非推荐应用启用灰度模式"
+            android:title="非推荐应用灰度模式"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <!-- 紧急场景 -->
+    <PreferenceCategory
+        android:summary="临时暂停应用功能"
+        android:title="紧急场景"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="volume_down_quick_restore"
+            android:summary="快速恢复黑白页面的颜色"
+            android:title="双击音量下键短暂暂停功能"
+            app:iconSpaceReserved="false" />
+
+        <SeekBarPreference
+            android:defaultValue="300"
+            android:dependency="volume_down_quick_restore"
+            android:key="volume_click_interval"
+            android:max="1000"
+            android:title="双击音量键判定的时间间隔"
+            android:summary="处于间隔内的双击会被判定为触发"
+            app:min="100"
+            app:iconSpaceReserved="false"
+            app:showSeekBarValue="true" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="volume_both_pause_time_enabled"
+            android:summary="同时按下音量加减键暂停功能指定时间，重复触发则清除"
+            android:title="同时按下音量键暂停指定时间"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue="15"
+            android:dependency="volume_both_pause_time_enabled"
+            android:inputType="number"
+            android:key="pause_duration_minutes"
+            android:summary="当前设置：%s 分钟"
+            android:title="暂停功能指定时间（分钟）"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="volume_down_long_press_enabled"
+            android:summary="长按音量下键1秒后松开, 暂停功能直到重新长按启用功能"
+            android:title="长按音量下键手动关闭和开启"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- 勿扰模式设置 -->
+    <PreferenceCategory
+        android:summary="勿扰时段内不开启灰度模式和应用守卫功能"
+        android:title="勿扰模式"
+        app:iconSpaceReserved="false">
+
+        <!-- 周一设置 -->
+        <PreferenceCategory
+            android:title="周一"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_monday_enabled"
+                android:title="启用周一勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_monday_enabled"
+                android:inputType="text"
+                android:key="dnd_monday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_monday_enabled"
+                android:inputType="text"
+                android:key="dnd_monday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+        <!-- 周二设置 -->
+        <PreferenceCategory
+            android:title="周二"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_tuesday_enabled"
+                android:title="启用周二勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_tuesday_enabled"
+                android:inputType="text"
+                android:key="dnd_tuesday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_tuesday_enabled"
+                android:inputType="text"
+                android:key="dnd_tuesday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+        <!-- 周三设置 -->
+        <PreferenceCategory
+            android:title="周三"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_wednesday_enabled"
+                android:title="启用周三勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_wednesday_enabled"
+                android:inputType="text"
+                android:key="dnd_wednesday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_wednesday_enabled"
+                android:inputType="text"
+                android:key="dnd_wednesday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+        <!-- 周四设置 -->
+        <PreferenceCategory
+            android:title="周四"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_thursday_enabled"
+                android:title="启用周四勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_thursday_enabled"
+                android:inputType="text"
+                android:key="dnd_thursday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_thursday_enabled"
+                android:inputType="text"
+                android:key="dnd_thursday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+        <!-- 周五设置 -->
+        <PreferenceCategory
+            android:title="周五"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_friday_enabled"
+                android:title="启用周五勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_friday_enabled"
+                android:inputType="text"
+                android:key="dnd_friday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_friday_enabled"
+                android:inputType="text"
+                android:key="dnd_friday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+        <!-- 周六设置 -->
+        <PreferenceCategory
+            android:title="周六"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_saturday_enabled"
+                android:title="启用周六勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_saturday_enabled"
+                android:inputType="text"
+                android:key="dnd_saturday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_saturday_enabled"
+                android:inputType="text"
+                android:key="dnd_saturday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+        <!-- 周日设置 -->
+        <PreferenceCategory
+            android:title="周日"
+            app:iconSpaceReserved="false">
+            
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="dnd_sunday_enabled"
+                android:title="启用周日勿扰模式"
+                app:iconSpaceReserved="false" />
+                
+            <EditTextPreference
+                android:defaultValue="08:00"
+                android:dependency="dnd_sunday_enabled"
+                android:inputType="text"
+                android:key="dnd_sunday_start"
+                android:title="开始时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+                
+            <EditTextPreference
+                android:defaultValue="22:00"
+                android:dependency="dnd_sunday_enabled"
+                android:inputType="text"
+                android:key="dnd_sunday_end"
+                android:title="结束时间"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+
+    </PreferenceCategory>
+
+    <!-- 恢复默认设置 -->
+    <PreferenceCategory
+        android:title="其他"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="reset_to_default"
+            android:summary="将所有设置恢复为默认值"
+            android:title="恢复默认数值"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen> 

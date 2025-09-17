@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.seeother.ui.monitor.MonitorFragment"
+        android:label="@string/title_monitor"
+        tools:layout="@layout/fragment_monitor" />
+
+    <fragment
+        android:id="@+id/navigation_recommend"
+        android:name="com.seeother.ui.recommend.RecommendFragment"
+        android:label="@string/title_recommend"
+        tools:layout="@layout/fragment_recommend" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.seeother.ui.settings.SettingFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/navigation_add_app"
+        android:name="com.seeother.ui.monitor.AddAppFragment"
+        android:label="@string/title_monitor_add_app"
+        tools:layout="@layout/fragment_monitor_add_app" />
+
+    <fragment
+        android:id="@+id/navigation_add_recommend_app"
+        android:name="com.seeother.ui.recommend.AddAppFragment"
+        android:label="@string/title_recommend_add_app"
+        tools:layout="@layout/fragment_monitor_add_app" />
+
+    <fragment
+        android:id="@+id/monitorAppConfigFragment"
+        android:name="com.seeother.ui.monitor.MonitorAppConfigFragment"
+        android:label="少用应用配置">
+        <argument
+            android:name="pkgName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recommendAppConfigFragment"
+        android:name="com.seeother.ui.recommend.RecommendAppConfigFragment"
+        android:label="多用应用配置">
+        <argument
+            android:name="pkgName"
+            app:argType="string" />
+    </fragment>
+</navigation>

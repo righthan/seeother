@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SeeOther</string>
+    <string name="title_monitor">少用</string>
+    <string name="title_monitor_add_app">添加监管App</string>
+    <string name="title_recommend_add_app">添加推荐跳转App</string>
+    <string name="title_recommend">多用</string>
+    <string name="title_statistics">统计</string>
+    <string name="title_settings">设置</string>
+    <string name="enable_gray_mode">启用灰度模式</string>
+    <string name="save">保存</string>
+    <string name="accessibility_service_description">SeeOther应用无障碍权限</string>
+</resources>

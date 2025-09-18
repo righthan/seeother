@@ -2,6 +2,20 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- 问题与反馈 -->
+    <PreferenceCategory
+        android:summary="遇到问题或需要帮助时点击查看"
+        android:title="问题与反馈"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="feedback_and_problems"
+            android:summary="查看常见问题和提交反馈"
+            android:title="问题与反馈"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
     <!-- 应用权限 -->
     <!-- iconSpaceReserved: 是否保留图标和标题之间的间距, 因为没有图标, 所以设置为false, 否则左边距过大 -->
     <PreferenceCategory

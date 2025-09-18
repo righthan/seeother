@@ -1,7 +1,9 @@
 package com.seeother.ui.monitor;
 
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -208,16 +210,14 @@ public class MonitorAppConfigFragment extends Fragment {
 
         // 反馈点击事件
         binding.tvGuardFeedback.setOnClickListener(v -> {
-            // TODO: 实现反馈功能
-            Toast.makeText(requireContext(), "反馈功能正在开发中...", Toast.LENGTH_SHORT).show();
+            openFeedbackWebsite();
         });
     }
 
     private void setupUnsupportedGuardListeners() {
         // 反馈适配按钮
         binding.btnFeedbackAdaptation.setOnClickListener(v -> {
-            // TODO: 实现反馈适配功能
-            Toast.makeText(requireContext(), "反馈适配功能正在开发中...", Toast.LENGTH_SHORT).show();
+            openFeedbackWebsite();
         });
     }
 
@@ -309,6 +309,19 @@ public class MonitorAppConfigFragment extends Fragment {
                 }
             });
         }).start();
+    }
+
+    /**
+     * 打开反馈网站
+     */
+    private void openFeedbackWebsite() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://app.seeother.me/problems.html"));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "无法打开浏览器", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

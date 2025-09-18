@@ -29,6 +29,7 @@ import java.util.Objects;
 public class SettingFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private Preference feedbackAndProblemsPref;
     private Preference overlayPermissionPref;
     private Preference usageStatsPermissionPref;
     private Preference accessibilityPermissionPref;
@@ -54,6 +55,9 @@ public class SettingFragment extends PreferenceFragmentCompat
     }
 
     private void initializePreferences() {
+        // 问题与反馈
+        feedbackAndProblemsPref = findPreference("feedback_and_problems");
+        
         // 权限相关
         overlayPermissionPref = findPreference("overlay_permission");
         usageStatsPermissionPref = findPreference("usage_stats_permission");
@@ -74,6 +78,13 @@ public class SettingFragment extends PreferenceFragmentCompat
     }
 
     private void setupPermissionPreferences() {
+        if (feedbackAndProblemsPref != null) {
+            feedbackAndProblemsPref.setOnPreferenceClickListener(preference -> {
+                openFeedbackWebsite();
+                return true;
+            });
+        }
+        
         if (overlayPermissionPref != null) {
             overlayPermissionPref.setOnPreferenceClickListener(preference -> {
                 if (!Settings.canDrawOverlays(requireContext())) {
@@ -393,5 +404,18 @@ public class SettingFragment extends PreferenceFragmentCompat
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @Nullable String key) {
 
+    }
+
+    /**
+     * 打开反馈网站
+     */
+    private void openFeedbackWebsite() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://app.seeother.me/problems.html"));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "无法打开浏览器", Toast.LENGTH_SHORT).show();
+        }
     }
 }

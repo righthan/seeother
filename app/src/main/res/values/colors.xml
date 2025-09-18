@@ -19,7 +19,4 @@
     <color name="gray_200">#FFEEEEEE</color>
     <color name="text_primary">#000000</color>
 
-    <color name="less_usage">#FFE57373</color>  <!-- Red 300 -->
-    <color name="more_usage">#FF81C784</color>  <!-- Green 300 -->
-    <color name="neutral_usage">#FFBDBDBD</color>  <!-- Grey 400 -->
 </resources>

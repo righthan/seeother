@@ -6,4 +6,4 @@
     android:canRequestFilterKeyEvents="true"
     android:canRetrieveWindowContent="true"
     android:description="@string/accessibility_service_description"
-    android:packageNames="com.seeother" /><!--canPerformGestures执行点击暂定播放-->
+    android:packageNames="com.seeother" />

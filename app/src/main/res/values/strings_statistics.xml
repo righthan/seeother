@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="jump_description">跳转到统计页面</string>
-    <string name="no_jump_description">不跳转到统计页面</string>
-    <string name="jump_to_statistics">跳转到统计页面</string>
-    <string name="dont_jump_to_statistics">不跳转到统计页面</string>
-</resources>

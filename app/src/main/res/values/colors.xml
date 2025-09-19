@@ -17,6 +17,11 @@
     <color name="green_500">#FF4CAF50</color>
     <color name="blue_500">#FF2196F3</color>
     <color name="gray_200">#FFEEEEEE</color>
+    <color name="gray_700">#FF616161</color>
+    <color name="gray_800">#FF424242</color>
+    <color name="gray_900">#FF212121</color>
     <color name="text_primary">#000000</color>
+    <color name="surface_dark">#FF2C2C2C</color>
+    <color name="background_dark">#FF121212</color>
 
 </resources>

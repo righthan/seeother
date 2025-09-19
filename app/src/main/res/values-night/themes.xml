@@ -6,17 +6,24 @@
         <item name="colorPrimaryVariant">@color/red_700</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/pink_200</item>
-        <item name="colorSecondaryVariant">@color/pink_200</item>
+        <item name="colorSecondary">@color/red_200</item>
+        <item name="colorSecondaryVariant">@color/red_700</item>
         <item name="colorOnSecondary">@color/black</item>
+        <!-- Surface colors for cards and input fields (dark theme) -->
+        <item name="colorSurface">@color/surface_dark</item>
+        <item name="colorOnSurface">@color/white</item>
+        <!-- Background colors (dark theme) -->
+        <item name="android:colorBackground">@color/background_dark</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- ActionBar title text color -->
         <item name="android:textColorPrimary">@color/white</item>
         <!-- ActionBar subtitle text color -->
         <item name="android:textColorSecondary">@color/white</item>
-        <!-- ActionBar background color -->
-        <item name="colorSurface">@color/red_500</item>
+        <!-- Material component colors for dark theme -->
+        <item name="colorControlNormal">@color/gray_700</item>
+        <item name="colorControlActivated">@color/red_200</item>
+        <item name="colorControlHighlight">@color/red_200</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

@@ -82,10 +82,27 @@ public class MainActivity extends AppCompatActivity {
         AppGuardManager appGuardManager = new AppGuardManager(this);
         appGuardManager.initializeGuardRules();
 
-        // 检查运行权限并跳转到设置页面
-        checkPermissionsAndNavigate(navController);
+        // 延迟检查权限，给系统时间处理无障碍服务的启用
+        checkPermissionsWithDelay(navController);
 
         startService(new Intent(this, UsageMonitorService.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 当Activity重新获得焦点时，重新检查权限状态
+        // 这样可以处理用户从设置页面返回后权限状态的变化
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        
+        // 如果当前在设置页面，不进行权限检查避免循环跳转
+        if (navController.getCurrentDestination() != null && 
+            navController.getCurrentDestination().getId() != R.id.navigation_settings) {
+            // 延迟检查，避免在Activity切换过程中检查
+            new android.os.Handler().postDelayed(() -> {
+                checkPermissionsAndNavigateQuiet(navController);
+            }, 1000);
+        }
     }
 
     @Override
@@ -95,9 +112,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * 延迟检查权限，给系统时间处理ADB权限设置的无障碍服务
+     */
+    private void checkPermissionsWithDelay(NavController navController) {
+        // 延迟2秒进行权限检查，给系统足够时间处理无障碍服务的启用
+        new android.os.Handler().postDelayed(() -> {
+            checkPermissionsAndNavigate(navController);
+        }, 2000);
+    }
+
+    /**
      * 检查运行权限并跳转到设置页面
      */
     private void checkPermissionsAndNavigate(NavController navController) {
+        checkPermissionsAndNavigate(navController, true);
+    }
+
+    /**
+     * 静默检查权限，不显示Toast提示
+     */
+    private void checkPermissionsAndNavigateQuiet(NavController navController) {
+        checkPermissionsAndNavigate(navController, false);
+    }
+
+    /**
+     * 检查运行权限并跳转到设置页面
+     * @param showToast 是否显示Toast提示
+     */
+    private void checkPermissionsAndNavigate(NavController navController, boolean showToast) {
         boolean needsPermission = false;
         StringBuilder missingPermissions = new StringBuilder();
 
@@ -124,10 +166,12 @@ public class MainActivity extends AppCompatActivity {
             new android.os.Handler().postDelayed(() -> {
                 navController.navigate(R.id.navigation_settings);
                 
-                // 显示提示信息
-                android.widget.Toast.makeText(this, 
-                    "请先开启以下权限：" + missingPermissions.toString(), 
-                    android.widget.Toast.LENGTH_LONG).show();
+                // 根据参数决定是否显示提示信息
+                if (showToast) {
+                    android.widget.Toast.makeText(this, 
+                        "请先开启以下权限：" + missingPermissions.toString(), 
+                        android.widget.Toast.LENGTH_LONG).show();
+                }
             }, 500);
         }
     }

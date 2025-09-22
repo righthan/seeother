@@ -70,30 +70,6 @@ public class AppGuardRuleRepository {
         return appGuardRuleDao.getRulesForPackageSync(packageName);
     }
 
-    // 获取启用的规则（LiveData）
-    public LiveData<List<AppGuardRule>> getEnabledRules() {
-        return appGuardRuleDao.getEnabledRules();
-    }
-
-    // 获取启用的规则（同步）
-    public List<AppGuardRule> getEnabledRulesSync() {
-        return appGuardRuleDao.getEnabledRulesSync();
-    }
-
-    // 设置包名启用状态
-    public void setPackageEnabled(String packageName, boolean enabled) {
-        executor.execute(() -> appGuardRuleDao.setPackageEnabled(packageName, enabled));
-    }
-
-    // 设置包名滑动个数
-    public void setPackageScrollCount(String packageName, int scrollCount) {
-        executor.execute(() -> appGuardRuleDao.setPackageScrollCount(packageName, scrollCount));
-    }
-
-    // 设置包名广播间隔
-    public void setPackageBroadcastInterval(String packageName, long interval) {
-        executor.execute(() -> appGuardRuleDao.setPackageBroadcastInterval(packageName, interval));
-    }
 
     // 获取所有包名
     public LiveData<List<String>> getAllPackages() {

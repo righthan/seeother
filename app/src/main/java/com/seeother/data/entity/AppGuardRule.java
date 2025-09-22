@@ -1,6 +1,7 @@
 package com.seeother.data.entity;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -42,63 +43,28 @@ public class AppGuardRule {
     private String specialSymbol;
 
     /**
-     * 是否启用此规则
-     */
-    private boolean enabled;
-
-    /**
-     * 事件触发间隔（毫秒）
-     */
-    private long broadcastInterval;
-
-    /**
      * 备注
      */
     private String remark;
-
-    /**
-     * 浏览个数阈值（触发守卫的滑动数量）
-     */
-    private int scrollCount;
 
     // 构造函数
     public AppGuardRule() {
         this.eventType = "S"; // 默认为TYPE_VIEW_SCROLLED
         this.useSpecialSymbol = false;
         this.specialSymbol = ""; // 默认为空，只有需要的应用才设置
-        this.enabled = true;
-        this.broadcastInterval = 500L; // 默认500ms间隔
-        this.scrollCount = 5; // 默认5个滑动量触发
     }
 
+    // There are multiple good constructors and Room will pick the no-arg constructor. You can use the @Ignore annotation to eliminate unwanted constructors.
+    @Ignore
     public AppGuardRule(String packageName, String eventType, String activityName,
-                        String viewId, boolean useSpecialSymbol, String specialSymbol,
-                        boolean enabled, long broadcastInterval, String remark) {
+                        String viewId, boolean useSpecialSymbol, String specialSymbol, String remark) {
         this.packageName = packageName;
         this.eventType = eventType;
         this.activityName = activityName;
         this.viewId = viewId;
         this.useSpecialSymbol = useSpecialSymbol;
         this.specialSymbol = specialSymbol;
-        this.enabled = enabled;
-        this.broadcastInterval = broadcastInterval;
         this.remark = remark;
-        this.scrollCount = 5; // 默认5个滑动量触发
-    }
-
-    public AppGuardRule(String packageName, String eventType, String activityName,
-                        String viewId, boolean useSpecialSymbol, String specialSymbol,
-                        boolean enabled, long broadcastInterval, String remark, int scrollCount) {
-        this.packageName = packageName;
-        this.eventType = eventType;
-        this.activityName = activityName;
-        this.viewId = viewId;
-        this.useSpecialSymbol = useSpecialSymbol;
-        this.specialSymbol = specialSymbol;
-        this.enabled = enabled;
-        this.broadcastInterval = broadcastInterval;
-        this.remark = remark;
-        this.scrollCount = scrollCount;
     }
 
     // Getters and Setters
@@ -158,21 +124,6 @@ public class AppGuardRule {
         this.specialSymbol = specialSymbol;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public long getBroadcastInterval() {
-        return broadcastInterval;
-    }
-
-    public void setBroadcastInterval(long broadcastInterval) {
-        this.broadcastInterval = broadcastInterval;
-    }
 
     public String getRemark() {
         return remark;
@@ -180,14 +131,6 @@ public class AppGuardRule {
 
     public void setRemark(String remark) {
         this.remark = remark;
-    }
-
-    public int getScrollCount() {
-        return scrollCount;
-    }
-
-    public void setScrollCount(int scrollCount) {
-        this.scrollCount = scrollCount;
     }
 
     /**

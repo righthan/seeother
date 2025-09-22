@@ -45,21 +45,6 @@ public interface AppGuardRuleRoomDao {
     @Query("SELECT * FROM app_guard_rules WHERE packageName = :packageName")
     List<AppGuardRule> getRulesForPackageSync(String packageName);
 
-    @Query("SELECT * FROM app_guard_rules WHERE enabled = 1")
-    LiveData<List<AppGuardRule>> getEnabledRules();
-
-    @Query("SELECT * FROM app_guard_rules WHERE enabled = 1")
-    List<AppGuardRule> getEnabledRulesSync();
-
-    @Query("UPDATE app_guard_rules SET enabled = :enabled WHERE packageName = :packageName")
-    void setPackageEnabled(String packageName, boolean enabled);
-
-    @Query("UPDATE app_guard_rules SET scrollCount = :scrollCount WHERE packageName = :packageName")
-    void setPackageScrollCount(String packageName, int scrollCount);
-
-    @Query("UPDATE app_guard_rules SET broadcastInterval = :interval WHERE packageName = :packageName")
-    void setPackageBroadcastInterval(String packageName, long interval);
-
     @Query("SELECT DISTINCT packageName FROM app_guard_rules ORDER BY packageName ASC")
     LiveData<List<String>> getAllPackages();
 

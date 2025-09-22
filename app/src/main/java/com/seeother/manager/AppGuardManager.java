@@ -9,6 +9,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.seeother.data.entity.AppGuardRule;
 import com.seeother.data.repository.AppGuardRuleRepository;
+import com.seeother.data.entity.MonitoredApp;
+import com.seeother.data.db.MonitoredAppDao;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class AppGuardManager {
     private final AppGuardRuleRepository repository;
     private String currentPackageName; // 当前加载规则的包名
     private final SettingsManager settingsManager;
+    private final MonitoredAppDao monitoredAppDao;
 
     public AppGuardManager(Context context) {
         this.context = context;
@@ -36,6 +39,7 @@ public class AppGuardManager {
         this.repository = new AppGuardRuleRepository(context);
         this.currentPackageName = "";
         this.settingsManager = new SettingsManager(context);
+        this.monitoredAppDao = new MonitoredAppDao(context);
     }
 
     /**
@@ -74,18 +78,10 @@ public class AppGuardManager {
         }
 
         List<AppGuardRule> packageRules = repository.getRulesForPackageSync(packageName);
-        List<AppGuardRule> enabledRules = new ArrayList<>();
-
-        // 只保留启用的规则
-        for (AppGuardRule rule : packageRules) {
-            if (rule.isEnabled()) {
-                enabledRules.add(rule);
-            }
-        }
 
         synchronized (currentAppRules) {
             currentAppRules.clear();
-            currentAppRules.addAll(enabledRules);
+            currentAppRules.addAll(packageRules);
             currentPackageName = packageName;
         }
 
@@ -95,7 +91,7 @@ public class AppGuardManager {
             Log.d(TAG, "切换应用，清空作者集合");
         }
 
-        Log.d(TAG, "为包名 " + packageName + " 加载了 " + enabledRules.size() + " 个启用的守卫规则");
+        Log.d(TAG, "为包名 " + packageName + " 加载了 " + packageRules.size() + " 个守卫规则");
     }
 
     /**
@@ -108,13 +104,13 @@ public class AppGuardManager {
         defaultRules.add(new AppGuardRule(
                 "com.tencent.mm", "S",
                 "com.tencent.mm.plugin.finder.ui.FinderHomeAffinityUI",
-                "", false, "", true, 1000L, "视频号主页"
+                "", false, "", "视频号主页"
         ));
 
         defaultRules.add(new AppGuardRule(
                 "com.tencent.mm", "S",
                 "com.tencent.mm.plugin.finder.ui.FinderShareFeedRelUI",
-                "", false, "", true, 1000L, "视频号分享"
+                "", false, "", "视频号分享"
         ));
 
         // 抖音 - 有ViewId，不需要特殊符号
@@ -122,7 +118,7 @@ public class AppGuardManager {
                 "com.ss.android.ugc.aweme", "C",
                 "",
                 "com.ss.android.ugc.aweme:id/title",
-                false, "", true, 500L, "抖音短视频"
+                false, "", "抖音短视频"
         ));
 
         // 小红书 - 有ViewId，不需要特殊符号
@@ -130,14 +126,14 @@ public class AppGuardManager {
                 "com.xingin.xhs", "S",
                 "com.xingin.matrix.detail.activity.DetailFeedActivity",
                 "com.xingin.xhs:id/matrixNickNameView",
-                false, "", true, 500L, "小红书详情页"
+                false, "", "小红书详情页"
         ));
 
         defaultRules.add(new AppGuardRule(
                 "com.xingin.xhs", "S",
                 "com.xingin.xhs.index.v2.IndexActivityV2",
                 "com.xingin.xhs:id/matrixNickNameView",
-                false, "", true, 500L, "小红书热门页面"
+                false, "", "小红书热门页面"
         ));
 
         // B站 - 有ViewId，不需要特殊符号
@@ -145,7 +141,7 @@ public class AppGuardManager {
                 "tv.danmaku.bili", "S",
                 "com.bilibili.video.story.StoryVideoActivity",
                 "tv.danmaku.bili:id/name",
-                false, "", true, 500L, "B站短视频页面"
+                false, "", "B站短视频页面"
         ));
 
         // 快手 - 有ViewId，不需要特殊符号  
@@ -153,14 +149,14 @@ public class AppGuardManager {
                 "com.smile.gifmaker", "S",
                 "com.yxcorp.gifshow.HomeActivity",
                 "",
-                true, "@", true, 500L, "快手精选页面"
+                true, "@", "快手精选页面"
         ));
 
         defaultRules.add(new AppGuardRule(
                 "com.smile.gifmaker", "S",
                 "com.yxcorp.gifshow.detail.PhotoDetailActivity",
                 "com.smile.gifmaker:id/username_group",
-                false, "", true, 500L, "快手首页"
+                false, "", "快手首页"
         ));
 
         // 淘宝 - 有ViewId，不需要特殊符号
@@ -168,7 +164,7 @@ public class AppGuardManager {
                 "com.taobao.taobao", "S",
                 "",
                 "com.taobao.taobao:id/video_host",
-                false, "", true, 500L, "淘宝短视频"
+                false, "", "淘宝短视频"
         ));
 
         // 支付宝 - 有ViewId，不需要特殊符号
@@ -176,7 +172,7 @@ public class AppGuardManager {
                 "com.eg.android.AlipayGphone", "S",
                 "",
                 "com.alipay.android.living.dynamic:id/author_title",
-                false, "", true, 500L, "支付宝生活动态"
+                false, "", "支付宝生活动态"
         ));
 
         // 微博 - 有ViewId，不需要特殊符号
@@ -184,35 +180,35 @@ public class AppGuardManager {
                 "com.sina.weibo", "S",
                 "",
                 "com.sina.weibo:id/nickname_new_ui_message",
-                false, "", true, 500L, "微博信息流"
+                false, "", "微博信息流"
         ));
 
         // QQ空间
         defaultRules.add(new AppGuardRule(
                 "com.tencent.mobileqq", "S",
                 "com.tencent.mobileqq.activity.QPublicTransFragmentActivity",
-                "", false, "", true, 500L, "QQ空间"
+                "", false, "", "QQ空间"
         ));
 
         // 爱奇艺 - 需要使用@符号判断
         defaultRules.add(new AppGuardRule(
                 "com.qiyi.video", "S",
                 "",
-                "", true, "@", true, 500L, "爱奇艺短视频"
+                "", true, "@", "爱奇艺短视频"
         ));
 
         // 拼多多 - 需要使用@符号判断
         defaultRules.add(new AppGuardRule(
                 "com.xunmeng.pinduoduo", "S",
                 "",
-                "", true, "@", true, 500L, "拼多多信息流"
+                "", true, "@", "拼多多信息流"
         ));
 
         // 红果短剧
         defaultRules.add(new AppGuardRule(
                 "com.phoenix.read", "S",
                 "com.dragon.read.component.shortvideo.impl.ShortSeriesActivity",
-                "", false, "", true, 500L, "红果短剧"
+                "", false, "", "红果短剧"
         ));
 
         return defaultRules;
@@ -226,15 +222,19 @@ public class AppGuardManager {
             return false;
         }
 
+        // 首先检查该应用是否在监控列表中且启用了守卫
+        MonitoredApp monitoredApp = monitoredAppDao.getAppByPkgName(packageName);
+        if (monitoredApp == null || !monitoredApp.isGuardEnabled()) {
+            return false;
+        }
+
         // 按需加载当前包名的规则
         loadRulesForPackage(packageName);
 
 //        Log.d(TAG, "shouldProcessEvent: eventType: " + eventType + ", packageName: " + packageName + ", activityName: " + activityName);
         synchronized (currentAppRules) {
             for (AppGuardRule rule : currentAppRules) {
-                if (rule.isEnabled() &&
-                        rule.matchesEventType(eventType) &&
-                        rule.matchesActivity(activityName)) {
+                if (rule.matchesEventType(eventType) && rule.matchesActivity(activityName)) {
                     return true;
                 }
             }
@@ -251,20 +251,24 @@ public class AppGuardManager {
             return;
         }
 
+        // 获取监控应用的配置
+        MonitoredApp monitoredApp = monitoredAppDao.getAppByPkgName(packageName);
+        if (monitoredApp == null || !monitoredApp.isGuardEnabled()) {
+            return;
+        }
+
         // 确保当前包名的规则已加载
         loadRulesForPackage(packageName);
 
         synchronized (currentAppRules) {
             for (AppGuardRule rule : currentAppRules) {
-                if (!rule.isEnabled() ||
-                        !rule.matchesEventType(eventType) ||
-                        !rule.matchesActivity(activityName)) {
+                if (!rule.matchesEventType(eventType) || !rule.matchesActivity(activityName)) {
                     continue;
                 }
 
                 // 事件处理间隔
                 long currentTime = System.currentTimeMillis();
-                if (currentTime - lastHandleTime < rule.getBroadcastInterval()) {
+                if (currentTime - lastHandleTime < monitoredApp.getBroadcastInterval()) {
                     continue;
                 }
                 lastHandleTime = currentTime;
@@ -275,13 +279,13 @@ public class AppGuardManager {
                     // 添加到作者集合中
                     synchronized (authorSet) {
                         authorSet.add(authorName);
-                        Log.d(TAG, "添加作者: " + authorName + ", 当前数量: " + authorSet.size() + "/" + rule.getScrollCount());
+                        Log.d(TAG, "添加作者: " + authorName + ", 当前数量: " + authorSet.size() + "/" + monitoredApp.getScrollCount());
 
                         // 检查是否达到浏览个数阈值
-                        if (authorSet.size() >= rule.getScrollCount() && !settingsManager.getPauseEnabled()) {
+                        if (authorSet.size() >= monitoredApp.getScrollCount() && !settingsManager.getPauseEnabled()) {
                             sendBroadcast();
                             authorSet.clear(); // 清空集合，重新开始计数
-                            Log.d(TAG, "发送守卫广播: " + packageName + " - " + authorName + ", 已达到阈值: " + rule.getScrollCount());
+                            Log.d(TAG, "发送守卫广播: " + packageName + " - " + authorName + ", 已达到阈值: " + monitoredApp.getScrollCount());
                         }
                     }
                     break; // 找到匹配的规则后就退出

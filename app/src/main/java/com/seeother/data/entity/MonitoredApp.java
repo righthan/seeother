@@ -13,6 +13,11 @@ public class MonitoredApp {
     private boolean enableGrayMode;
     private boolean enableHighContrast;
     private String pkgName;
+    
+    // 守卫相关配置
+    private boolean guardEnabled;           // 是否启用守卫
+    private int scrollCount;               // 滑动次数阈值
+    private long broadcastInterval;        // 检测间隔（毫秒）
 
     // These fields are not stored in database
     @Ignore
@@ -22,11 +27,15 @@ public class MonitoredApp {
 
     // Default constructor for Room
     public MonitoredApp() {
+        this.guardEnabled = false;         // 默认不启用守卫
+        this.scrollCount = 5;             // 默认5个滑动触发
+        this.broadcastInterval = 500L;    // 默认500ms间隔
     }
 
     // Constructor with original parameters
     @Ignore
     public MonitoredApp(boolean enableGrayMode, String pkgName) {
+        this();
         this.enableGrayMode = enableGrayMode;
         this.enableHighContrast = false;
         this.pkgName = pkgName;
@@ -35,6 +44,7 @@ public class MonitoredApp {
     // New constructor including appName and appIcon
     @Ignore
     public MonitoredApp(boolean enableGrayMode, String pkgName, String appName, Drawable appIcon) {
+        this();
         this.enableGrayMode = enableGrayMode;
         this.enableHighContrast = false;
         this.pkgName = pkgName;
@@ -91,5 +101,30 @@ public class MonitoredApp {
 
     public void setAppIcon(Drawable appIcon) {
         this.appIcon = appIcon;
+    }
+
+    // 守卫相关字段的 getter 和 setter
+    public boolean isGuardEnabled() {
+        return guardEnabled;
+    }
+
+    public void setGuardEnabled(boolean guardEnabled) {
+        this.guardEnabled = guardEnabled;
+    }
+
+    public int getScrollCount() {
+        return scrollCount;
+    }
+
+    public void setScrollCount(int scrollCount) {
+        this.scrollCount = scrollCount;
+    }
+
+    public long getBroadcastInterval() {
+        return broadcastInterval;
+    }
+
+    public void setBroadcastInterval(long broadcastInterval) {
+        this.broadcastInterval = broadcastInterval;
     }
 }

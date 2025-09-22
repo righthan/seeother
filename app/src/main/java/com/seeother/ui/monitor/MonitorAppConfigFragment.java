@@ -145,11 +145,9 @@ public class MonitorAppConfigFragment extends Fragment {
     private void setupGuardConfigListeners() {
         // 启用守卫开关
         binding.switchGuardEnabled.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // 更新所有规则的启用状态
-            new Thread(() -> {
-                appGuardRuleRepository.setPackageEnabled(monitoredApp.getPkgName(), isChecked);
-                requireActivity().runOnUiThread(this::saveConfig);
-            }).start();
+            // 更新MonitoredApp的守卫启用状态
+            monitoredApp.setGuardEnabled(isChecked);
+            saveConfig();
         });
 
         // 滑动次数阈值
@@ -168,10 +166,9 @@ public class MonitorAppConfigFragment extends Fragment {
                     try {
                         int scrollCount = Integer.parseInt(s.toString());
                         if (scrollCount > 0) {
-                            // 更新所有规则的滑动次数
-                            new Thread(() -> {
-                                appGuardRuleRepository.setPackageScrollCount(monitoredApp.getPkgName(), scrollCount);
-                            }).start();
+                            // 更新MonitoredApp的滑动次数
+                            monitoredApp.setScrollCount(scrollCount);
+                            saveConfig();
                         }
                     } catch (NumberFormatException e) {
                         // 忽略无效输入
@@ -196,10 +193,9 @@ public class MonitorAppConfigFragment extends Fragment {
                     try {
                         long interval = Long.parseLong(s.toString());
                         if (interval > 0) {
-                            // 更新所有规则的广播间隔
-                            new Thread(() -> {
-                                appGuardRuleRepository.setPackageBroadcastInterval(monitoredApp.getPkgName(), interval);
-                            }).start();
+                            // 更新MonitoredApp的广播间隔
+                            monitoredApp.setBroadcastInterval(interval);
+                            saveConfig();
                         }
                     } catch (NumberFormatException e) {
                         // 忽略无效输入
@@ -226,25 +222,13 @@ public class MonitorAppConfigFragment extends Fragment {
             return;
         }
 
-        // 使用第一个规则的配置作为显示值（假设同一包名的规则配置相同）
-        AppGuardRule firstRule = guardRules.get(0);
-
-        // 检查是否有启用的规则
-        boolean hasEnabledRule = false;
-        for (AppGuardRule rule : guardRules) {
-            if (rule.isEnabled()) {
-                hasEnabledRule = true;
-                break;
-            }
-        }
-
-        // 暂时移除监听器，避免触发Toast
+        // 暂时移除监听器，避免触发保存
         binding.switchGuardEnabled.setOnCheckedChangeListener(null);
-        binding.switchGuardEnabled.setChecked(hasEnabledRule);
+        binding.switchGuardEnabled.setChecked(monitoredApp.isGuardEnabled());
         setupGuardConfigListeners();  // 重新设置监听器
 
-        binding.etScrollCount.setText(String.valueOf(firstRule.getScrollCount()));
-        binding.etCheckInterval.setText(String.valueOf(firstRule.getBroadcastInterval()));
+        binding.etScrollCount.setText(String.valueOf(monitoredApp.getScrollCount()));
+        binding.etCheckInterval.setText(String.valueOf(monitoredApp.getBroadcastInterval()));
     }
 
 

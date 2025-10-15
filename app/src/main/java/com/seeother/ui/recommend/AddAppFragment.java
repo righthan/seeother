@@ -115,6 +115,16 @@ public class AddAppFragment extends Fragment {
                 }
                 appList.add(app);
             }
+            // 将选中的应用排在前面
+            appList.sort((app1, app2) -> {
+                if (app1.getChecked() && !app2.getChecked()) {
+                    return -1; // app1排在前面
+                } else if (!app1.getChecked() && app2.getChecked()) {
+                    return 1; // app2排在前面
+                } else {
+                    return 0; // 保持原顺序
+                }
+            });
             adapter.setAppList(appList);
         });
     }

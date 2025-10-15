@@ -107,7 +107,7 @@ public class AddAppListAdapter extends RecyclerView.Adapter<AddAppListAdapter.Vi
                                             .setPositiveButton("我知道了", (dialog, which) -> {
                                                 context.startActivity(intent);
                                             })
-                                            .setNegativeButton("取消", null)
+                                            .setNegativeButton("稍后同意", null)
                                             .show();
                                 }
                             });

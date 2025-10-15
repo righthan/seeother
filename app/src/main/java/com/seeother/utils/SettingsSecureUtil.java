@@ -8,6 +8,8 @@ import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
+import com.seeother.R;
+
 import java.lang.ref.WeakReference;
 import java.time.LocalTime;
 import java.util.Calendar;
@@ -17,6 +19,8 @@ public class SettingsSecureUtil {
     private static SettingsSecureUtil instance;
     private final ContentResolver contentResolver;
     private final WeakReference<Context> contextRef;
+
+    private final String serviceName = "com.seeother/.service.MyAccessibilityService";
 
     private SettingsSecureUtil(ContentResolver contentResolver, Context context) {
         this.contentResolver = contentResolver;
@@ -51,9 +55,7 @@ public class SettingsSecureUtil {
      */
     public boolean hasWriteSecureSettingsPermission() {
         try {
-            String serviceName = "com.seeother/.service.MyAccessibilityService";
             Settings.Secure.putString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, serviceName);
-            Settings.Secure.putInt(contentResolver, Settings.Secure.ACCESSIBILITY_ENABLED, 1);
             return true;
         } catch (Exception e) {
             Log.e(TAG, "检查WRITE_SECURE_SETTINGS权限失败", e);
@@ -66,11 +68,40 @@ public class SettingsSecureUtil {
      */
     public void enableAccessibilityService() {
         try {
-            String serviceName = "com.seeother/.service.MyAccessibilityService";
-            Settings.Secure.putString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, serviceName);
-            Settings.Secure.putInt(contentResolver, Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+            // 先移除然后刷新授权状态, 然后再添加
+            disableAccessibilityService();
+            new android.os.Handler().postDelayed(() -> {
+                Settings.Secure.putString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, serviceName);
+            }, 500);
         } catch (Exception e) {
             Log.e(TAG, "开启无障碍服务失败", e);
+            Context context = getContext();
+            if (context != null) {
+                GlobalToast.showShort(context, "请授予ADB权限");
+            }
+        }
+    }
+
+    public void disableAccessibilityService() {
+        try {
+            String enabledServices = Settings.Secure.getString(
+                    contentResolver,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            );
+
+            if (enabledServices != null && enabledServices.contains(serviceName)) {
+                // Remove the service name
+                String updatedServices = enabledServices.replace(serviceName, "").trim();
+
+                // Update the system setting
+                Settings.Secure.putString(
+                        contentResolver,
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                        updatedServices
+                );
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "关闭无障碍服务失败", e);
             Context context = getContext();
             if (context != null) {
                 GlobalToast.showShort(context, "请授予ADB权限");
@@ -132,6 +163,7 @@ public class SettingsSecureUtil {
 
     /**
      * 检查当前时间是否在勿扰模式时段内
+     *
      * @return true表示在勿扰时段内，应该禁用功能
      */
     public boolean isInDoNotDisturbTime() {
@@ -141,7 +173,7 @@ public class SettingsSecureUtil {
         }
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        
+
         // 获取当前时间和星期
         Calendar calendar = Calendar.getInstance();
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
@@ -167,7 +199,7 @@ public class SettingsSecureUtil {
             // 解析时间字符串
             String[] startParts = startTimeStr.split(":");
             String[] endParts = endTimeStr.split(":");
-            
+
             int startTimeInMinutes = Integer.parseInt(startParts[0]) * 60 + Integer.parseInt(startParts[1]);
             int endTimeInMinutes = Integer.parseInt(endParts[0]) * 60 + Integer.parseInt(endParts[1]);
 
@@ -187,6 +219,7 @@ public class SettingsSecureUtil {
 
     /**
      * 获取勿扰模式的状态描述
+     *
      * @return 勿扰模式状态描述
      */
     public String getDoNotDisturbStatus() {
@@ -201,10 +234,10 @@ public class SettingsSecureUtil {
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             String[] weekdays = {"", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
             String todayKey = weekdays[dayOfWeek];
-            
+
             String startTime = preferences.getString("dnd_" + todayKey + "_start", "22:00");
             String endTime = preferences.getString("dnd_" + todayKey + "_end", "08:00");
-            
+
             return "勿扰模式已启用 (" + startTime + " - " + endTime + ")";
         } else {
             return "勿扰模式未启用";

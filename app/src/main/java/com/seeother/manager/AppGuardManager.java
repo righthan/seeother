@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.room.RoomDatabase;
 
 import com.seeother.data.entity.AppGuardRule;
 import com.seeother.data.repository.AppGuardRuleRepository;
@@ -46,27 +47,19 @@ public class AppGuardManager {
      * 初始化守卫规则（从数据库加载或创建默认规则）
      */
     public void initializeGuardRules() {
-        // 异步执行初始化
-        new Thread(() -> {
-            try {
-                // 每次启动都清空现有规则并重新插入默认规则
-                repository.deleteAll();
-                Log.d(TAG, "清空现有守卫规则");
-                
-                // 创建并插入默认规则
-                List<AppGuardRule> defaultRules = createDefaultRules();
-                repository.insertAll(defaultRules);
-                Log.d(TAG, "插入了 " + defaultRules.size() + " 个默认守卫规则到数据库");
-
-                // 初始化完成，规则将在首次需要时按包名加载
-                Log.d(TAG, "应用守卫管理器初始化完成");
-
-            } catch (Exception e) {
-                Log.e(TAG, "初始化守卫规则失败", e);
-                // 如果数据库操作失败，记录错误但不加载默认规则到内存
-                // 规则将在运行时按需加载，如果失败会使用空规则列表
-            }
-        }).start();
+        try {
+            List<AppGuardRule> defaultRules = createDefaultRules();
+            // 每次启动都清空现有规则并重新插入默认规则
+            repository.deleteAll();
+            new android.os.Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    repository.insertAll(defaultRules);
+                }
+            }, 1000);
+        } catch (Exception e) {
+            Log.e(TAG, "初始化守卫规则失败", e);
+        }
     }
 
     /**

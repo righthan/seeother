@@ -3,6 +3,7 @@ package com.seeother.data.repository;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import androidx.room.Transaction;
 
 import com.seeother.data.dao.AppGuardRuleRoomDao;
 import com.seeother.data.db.AppDatabase;

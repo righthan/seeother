@@ -87,6 +87,22 @@
             android:summary="在非勿扰时段，为非推荐应用启用灰度模式"
             android:title="非推荐应用灰度模式"
             app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="recommend_on_less_used_app"
+            android:summary="打开少用应用时，自动打开推荐应用"
+            android:title="打开少用应用时推荐"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue="1"
+            android:dependency="recommend_on_less_used_app"
+            android:inputType="number"
+            android:key="recommend_interval_minutes"
+            android:summary="当前设置：%s 分钟"
+            android:title="推荐间隔时间（分钟）"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
     <!-- 紧急场景 -->

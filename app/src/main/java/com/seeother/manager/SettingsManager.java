@@ -73,4 +73,27 @@ public class SettingsManager {
             return 15;
         }
     }
+
+    // 推荐应用设置
+    public boolean isRecommendOnLessUsedAppEnabled() {
+        return preferences.getBoolean("recommend_on_less_used_app", false);
+    }
+
+    public int getRecommendIntervalMinutes() {
+        try {
+            String value = preferences.getString("recommend_interval_minutes", "1");
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 1;
+        }
+    }
+
+    // 上次推荐时间记录
+    public long getLastRecommendTime() {
+        return preferences.getLong("last_recommend_time", 0);
+    }
+
+    public void setLastRecommendTime(long timestamp) {
+        preferences.edit().putLong("last_recommend_time", timestamp).apply();
+    }
 }

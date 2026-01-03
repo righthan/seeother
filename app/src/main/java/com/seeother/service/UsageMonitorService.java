@@ -46,6 +46,7 @@ public class UsageMonitorService extends Service {
     private RecommendAppDao recommendAppDao;
     private SettingsManager settingsManager;
     private RecommendLinkManager linkManager;
+    private long lastRecommendTime = 0; // 记录上次推荐的时间
 
     // 广播接收器
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -87,6 +88,8 @@ public class UsageMonitorService extends Service {
 
         settingsManager = new SettingsManager(this);
         linkManager = RecommendLinkManager.getInstance(this);
+        // 读取上次推荐时间
+        lastRecommendTime = settingsManager.getLastRecommendTime();
         // 注册广播
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.seeother.action.WINDOW_STATE_CHANGED");
@@ -199,6 +202,20 @@ public class UsageMonitorService extends Service {
                     // 情况2：非推荐应用灰度模式
                     else if (shouldEnableGrayModeForNonRecommendApp(packageName)) {
                         shouldEnableGrayMode = true;
+                    }
+
+                    // 检查是否需要在打开少用应用时推荐其他应用
+                    if (shouldRecommendOnLessUsedApp()) {
+                        handler.postDelayed(() -> {
+                            if (linkManager.shouldOpenLink()) {
+                                openRecommendedLink();
+                            } else {
+                            // 更新推荐时间
+                            lastRecommendTime = System.currentTimeMillis();
+                            settingsManager.setLastRecommendTime(lastRecommendTime);
+                                openRecommendedApp();
+                            }
+                        }, 100); // 延迟100ms，确保应用已经打开
                     }
                 }
             } catch (IllegalStateException e) {
@@ -362,6 +379,42 @@ public class UsageMonitorService extends Service {
         // 检查当前应用是否为推荐应用
         RecommendApp recommendApp = recommendAppDao.getAppByPkgName(packageName);
         return recommendApp == null; // 如果不是推荐应用，返回true
+    }
+
+    /**
+     * 检查是否应该在打开少用应用时推荐其他应用
+     * 条件：1. 开关已启用 2. 暂停功能未启用 3. 当前应用是监控应用 
+     * 4. 距离上次推荐时间超过设定阈值
+     *
+     * @return true表示应该触发推荐
+     */
+    private boolean shouldRecommendOnLessUsedApp() {
+        // 检查开关是否启用
+        if (!settingsManager.isRecommendOnLessUsedAppEnabled()) {
+            return false;
+        }
+
+        // 检查暂停功能是否启用
+        if (settingsManager.getPauseEnabled()) {
+            return false;
+        }
+
+        // 检查当前应用是否为监控应用
+        if (monitoredApp == null) {
+            return false;
+        }
+
+        // 检查时间间隔是否足够
+        long currentTime = System.currentTimeMillis();
+        int intervalMinutes = settingsManager.getRecommendIntervalMinutes();
+        long intervalMillis = intervalMinutes * 60 * 1000L;
+        
+        if (currentTime - lastRecommendTime < intervalMillis) {
+            Log.d(TAG, "距离上次推荐时间不足 " + intervalMinutes + " 分钟，跳过本次推荐");
+            return false;
+        }
+
+        return true;
     }
 
     @Override

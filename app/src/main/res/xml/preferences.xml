@@ -2,6 +2,20 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- 暂停模式状态 -->
+    <PreferenceCategory
+        android:title="当前状态"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="pause_mode_status"
+            android:summary="功能正常运行"
+            android:title="应用状态"
+            app:iconSpaceReserved="false"
+            android:selectable="false" />
+
+    </PreferenceCategory>
+
     <!-- 问题与反馈 -->
     <PreferenceCategory
         android:summary="遇到问题或需要帮助时点击查看"

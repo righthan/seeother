@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.seeother.R;
+import com.seeother.manager.SettingsManager;
 import com.seeother.utils.SettingsSecureUtil;
 
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.Objects;
 public class SettingFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private Preference pauseModeStatusPref;
     private Preference feedbackAndProblemsPref;
     private Preference overlayPermissionPref;
     private Preference usageStatsPermissionPref;
@@ -55,6 +57,9 @@ public class SettingFragment extends PreferenceFragmentCompat
     }
 
     private void initializePreferences() {
+        // 暂停模式状态
+        pauseModeStatusPref = findPreference("pause_mode_status");
+        
         // 问题与反馈
         feedbackAndProblemsPref = findPreference("feedback_and_problems");
         
@@ -204,6 +209,7 @@ public class SettingFragment extends PreferenceFragmentCompat
         super.onResume();
         updatePermissionStatus();
         updateEditTextSummaries();
+        updatePauseStatus();
         Objects.requireNonNull(getPreferenceScreen().getSharedPreferences())
                 .registerOnSharedPreferenceChangeListener(this);
     }
@@ -401,9 +407,50 @@ public class SettingFragment extends PreferenceFragmentCompat
         }
     }
 
+    // 更新暂停模式状态显示
+    private void updatePauseStatus() {
+        if (pauseModeStatusPref != null) {
+            SettingsManager settingsManager = new SettingsManager(requireContext());
+            boolean isPaused = settingsManager.getPauseEnabled();
+            
+            if (isPaused) {
+                long timestamp = settingsManager.getPauseUntilTimestamp();
+                if (timestamp == -1) {
+                    // 手动暂停，直到重新开启
+                    pauseModeStatusPref.setTitle("应用状态：已暂停");
+                    pauseModeStatusPref.setSummary("功能已手动暂停，需要重新开启");
+                } else {
+                    // 定时暂停
+                    long currentTime = System.currentTimeMillis();
+                    long remainingTime = timestamp - currentTime;
+                    if (remainingTime > 0) {
+                        long minutes = remainingTime / (60 * 1000);
+                        long seconds = (remainingTime % (60 * 1000)) / 1000;
+                        pauseModeStatusPref.setTitle("应用状态：已暂停");
+                        if (minutes > 0) {
+                            pauseModeStatusPref.setSummary(String.format("功能已暂停，剩余 %d 分钟 %d 秒", minutes, seconds));
+                        } else {
+                            pauseModeStatusPref.setSummary(String.format("功能已暂停，剩余 %d 秒", seconds));
+                        }
+                    } else {
+                        // 时间已过期，应该已经自动恢复
+                        pauseModeStatusPref.setTitle("应用状态");
+                        pauseModeStatusPref.setSummary("功能正常运行");
+                    }
+                }
+            } else {
+                pauseModeStatusPref.setTitle("应用状态");
+                pauseModeStatusPref.setSummary("功能正常运行");
+            }
+        }
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @Nullable String key) {
-
+        // 如果暂停相关的设置改变，更新状态显示
+        if ("pause_until_timestamp".equals(key)) {
+            updatePauseStatus();
+        }
     }
 
     /**

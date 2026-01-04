@@ -38,10 +38,14 @@ public class SettingsManager {
     /**
      * 检查是否处于功能暂停状态
      *
-     * @return 当设置了暂停时间, 或者暂停直到手动开启(时间被设置为-1)
+     * @return 当设置了暂停时间且未过期, 或者暂停直到手动开启(时间被设置为-1)
      */
     public boolean getPauseEnabled() {
-        return getPauseUntilTimestamp() > 0 || getPauseUntilTimestamp()==-1;
+        long pauseUntil = getPauseUntilTimestamp();
+        if (pauseUntil == -1) {
+            return true; // 暂停直到手动开启
+        }
+        return pauseUntil > 0 && System.currentTimeMillis() < pauseUntil;
     }
 
     public void clearPause() {

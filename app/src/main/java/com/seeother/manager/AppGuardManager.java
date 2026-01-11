@@ -271,6 +271,13 @@ public class AppGuardManager {
                 String authorName = extractAuthorName(rule, rootNode);
 
                 if (authorName != null && !authorName.isEmpty()) {
+                    // 检查是否在雷打不动时间段内
+                    if (settingsManager.isInUnshakableTime() && !settingsManager.getPauseEnabled()) {
+                        Log.d(TAG, "处于雷打不动时间段，直接发送守卫广播");
+                        sendBroadcast();
+                        break;
+                    }
+                    
                     // 添加到作者集合中
                     synchronized (authorSet) {
                         authorSet.add(authorName);

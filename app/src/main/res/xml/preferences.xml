@@ -372,6 +372,20 @@
 
     </PreferenceCategory>
 
+    <!-- 雷打不动时间设置 -->
+    <PreferenceCategory
+        android:summary="在这些时间段内立即触发守卫"
+        android:title="雷打不动时间"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="unshakable_time_settings"
+            android:summary="点击设置多个雷打不动时间段"
+            android:title="管理雷打不动时间段"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
     <!-- 恢复默认设置 -->
     <PreferenceCategory
         android:title="其他"

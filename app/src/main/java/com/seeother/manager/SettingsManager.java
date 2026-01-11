@@ -100,4 +100,89 @@ public class SettingsManager {
     public void setLastRecommendTime(long timestamp) {
         preferences.edit().putLong("last_recommend_time", timestamp).apply();
     }
+
+    // 雷打不动时间设置
+    /**
+     * 保存雷打不动时间段列表
+     * 格式: "HH:mm-HH:mm;HH:mm-HH:mm" 例如: "22:00-23:59;06:00-07:30"
+     */
+    public void setUnshakableTimePeriods(String timePeriods) {
+        preferences.edit().putString("unshakable_time_periods", timePeriods).apply();
+    }
+
+    /**
+     * 获取雷打不动时间段列表
+     */
+    public String getUnshakableTimePeriods() {
+        return preferences.getString("unshakable_time_periods", "");
+    }
+
+    /**
+     * 检查当前时间是否在雷打不动时间段内
+     * @return true表示在雷打不动时间段内
+     */
+    public boolean isInUnshakableTime() {
+        String timePeriods = getUnshakableTimePeriods();
+        if (timePeriods == null || timePeriods.trim().isEmpty()) {
+            return false;
+        }
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int currentHour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(java.util.Calendar.MINUTE);
+        int currentTimeInMinutes = currentHour * 60 + currentMinute;
+
+        // 分割多个时间段
+        String[] periods = timePeriods.split(";");
+        for (String period : periods) {
+            period = period.trim();
+            if (period.isEmpty()) {
+                continue;
+            }
+
+            try {
+                // 分割开始和结束时间
+                String[] times = period.split("-");
+                if (times.length != 2) {
+                    continue;
+                }
+
+                // 解析开始时间
+                String[] startParts = times[0].trim().split(":");
+                if (startParts.length != 2) {
+                    continue;
+                }
+                int startHour = Integer.parseInt(startParts[0]);
+                int startMinute = Integer.parseInt(startParts[1]);
+                int startTimeInMinutes = startHour * 60 + startMinute;
+
+                // 解析结束时间
+                String[] endParts = times[1].trim().split(":");
+                if (endParts.length != 2) {
+                    continue;
+                }
+                int endHour = Integer.parseInt(endParts[0]);
+                int endMinute = Integer.parseInt(endParts[1]);
+                int endTimeInMinutes = endHour * 60 + endMinute;
+
+                // 检查当前时间是否在该时间段内
+                if (startTimeInMinutes <= endTimeInMinutes) {
+                    // 正常情况：不跨天
+                    if (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes <= endTimeInMinutes) {
+                        return true;
+                    }
+                } else {
+                    // 跨天情况：例如 22:00-02:00
+                    if (currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes <= endTimeInMinutes) {
+                        return true;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                // 忽略格式错误的时间段
+                continue;
+            }
+        }
+
+        return false;
+    }
 }

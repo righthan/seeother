@@ -39,6 +39,7 @@ public class SettingFragment extends PreferenceFragmentCompat
     private Preference writeSecureSettingsPref;
     private Preference lockAppPermissionPref;
     private Preference resetToDefaultPref;
+    private Preference unshakableTimeSettingsPref;
 
     private EditTextPreference pauseDurationPref;
     private EditTextPreference popupThresholdPref;
@@ -74,6 +75,9 @@ public class SettingFragment extends PreferenceFragmentCompat
 
         // 恢复默认值
         resetToDefaultPref = findPreference("reset_to_default");
+        
+        // 雷打不动时间设置
+        unshakableTimeSettingsPref = findPreference("unshakable_time_settings");
 
         // 紧急场景相关
         pauseDurationPref = findPreference("pause_duration_minutes");
@@ -143,6 +147,13 @@ public class SettingFragment extends PreferenceFragmentCompat
         if (resetToDefaultPref != null) {
             resetToDefaultPref.setOnPreferenceClickListener(preference -> {
                 showResetConfirmDialog();
+                return true;
+            });
+        }
+        
+        if (unshakableTimeSettingsPref != null) {
+            unshakableTimeSettingsPref.setOnPreferenceClickListener(preference -> {
+                showUnshakableTimeDialog();
                 return true;
             });
         }
@@ -495,5 +506,13 @@ public class SettingFragment extends PreferenceFragmentCompat
         } catch (Exception e) {
             Toast.makeText(requireContext(), "无法打开浏览器", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    /**
+     * 显示雷打不动时间设置对话框
+     */
+    private void showUnshakableTimeDialog() {
+        UnshakableTimeDialog dialog = new UnshakableTimeDialog(requireContext());
+        dialog.show();
     }
 }

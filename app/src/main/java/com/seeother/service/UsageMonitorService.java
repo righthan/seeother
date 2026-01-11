@@ -28,6 +28,7 @@ import com.seeother.data.entity.MonitoredApp;
 import com.seeother.data.entity.RecommendApp;
 import com.seeother.manager.RecommendLinkManager;
 import com.seeother.manager.SettingsManager;
+import com.seeother.manager.StatisticsManager;
 import com.seeother.utils.SettingsSecureUtil;
 
 import java.util.Calendar;
@@ -46,6 +47,7 @@ public class UsageMonitorService extends Service {
     private RecommendAppDao recommendAppDao;
     private SettingsManager settingsManager;
     private RecommendLinkManager linkManager;
+    private StatisticsManager statisticsManager;
     private long lastRecommendTime = 0; // 记录上次推荐的时间
 
     // 广播接收器
@@ -88,6 +90,7 @@ public class UsageMonitorService extends Service {
 
         settingsManager = new SettingsManager(this);
         linkManager = RecommendLinkManager.getInstance(this);
+        statisticsManager = new StatisticsManager(this);
         // 读取上次推荐时间
         lastRecommendTime = settingsManager.getLastRecommendTime();
         // 注册广播
@@ -190,6 +193,15 @@ public class UsageMonitorService extends Service {
         if (!packageName.equals(currentPackage)) {
             currentPackage = packageName;
             monitoredApp = monitoredAppDao.getAppByPkgName(packageName);
+            
+            // 统计少用应用打开次数
+            if (monitoredApp != null) {
+                boolean reachedThreshold = statisticsManager.incrementMonitoredAppOpenCount();
+                if (reachedThreshold) {
+                    // 达到阈值，显示打开次数
+                    showMonitoredAppCountWindow();
+                }
+            }
 
             // 检查是否需要启用灰度模式，包含多种情况：
             // 1. 监控应用设置了启用灰度模式
@@ -235,6 +247,39 @@ public class UsageMonitorService extends Service {
                 disableGrayMode();
             }
         }
+    }
+
+    /**
+     * 显示少用应用打开次数的悬浮窗
+     */
+    private void showMonitoredAppCountWindow() {
+        try {
+            // 检查是否在勿扰时段
+            if (SettingsSecureUtil.getInstance().isInDoNotDisturbTime()) {
+                return;
+            }
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "SettingsSecureUtil 未初始化", e);
+            return;
+        }
+        
+        if (settingsManager.getPauseEnabled()) return;
+        
+        int openCount = statisticsManager.getMonitoredAppOpenCount();
+        
+        new Handler(Looper.getMainLooper()).post(() -> {
+            AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(this, com.google.android.material.R.style.Theme_MaterialComponents))
+                    .setTitle("少用应用统计")
+                    .setMessage("本月已打开少用应用 " + openCount + " 次\n\n")
+                    .setPositiveButton("知道了", null)
+                    .create();
+            
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+            }
+            
+            dialog.show();
+        });
     }
 
     private void showFloatingWindow() {

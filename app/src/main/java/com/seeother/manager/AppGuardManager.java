@@ -33,6 +33,7 @@ public class AppGuardManager {
     private String currentPackageName; // 当前加载规则的包名
     private final SettingsManager settingsManager;
     private final MonitoredAppDao monitoredAppDao;
+    private final StatisticsManager statisticsManager;
 
     public AppGuardManager(Context context) {
         this.context = context;
@@ -41,6 +42,7 @@ public class AppGuardManager {
         this.currentPackageName = "";
         this.settingsManager = new SettingsManager(context);
         this.monitoredAppDao = new MonitoredAppDao(context);
+        this.statisticsManager = new StatisticsManager(context);
     }
 
     /**
@@ -272,6 +274,14 @@ public class AppGuardManager {
                     // 添加到作者集合中
                     synchronized (authorSet) {
                         authorSet.add(authorName);
+                        
+                        // 统计短视频浏览次数
+                        boolean reachedVideoThreshold = statisticsManager.incrementShortVideoCount();
+                        if (reachedVideoThreshold) {
+                            // 达到阈值，显示统计信息
+                            showVideoStatistics();
+                        }
+                        
                         Log.d(TAG, "添加作者: " + authorName + ", 当前数量: " + authorSet.size() + "/" + monitoredApp.getScrollCount());
 
                         // 检查是否达到浏览个数阈值
@@ -434,6 +444,39 @@ public class AppGuardManager {
         }
 
         return null;
+    }
+
+    /**
+     * 显示短视频统计信息对话框
+     */
+    private void showVideoStatistics() {
+        StatisticsManager.VideoStatistics stats = statisticsManager.getVideoStatistics();
+        
+        String message = String.format(
+                "今天已刷短视频: %d 个\n已经花费时间: %s\n\n本月已刷短视频: %d 个\n已经花费时间: %s\n\n适度娱乐，珍惜时间！",
+                stats.todayCount,
+                stats.todayTime,
+                stats.monthCount,
+                stats.monthTime
+        );
+        
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(
+                    new androidx.appcompat.view.ContextThemeWrapper(
+                            context, 
+                            com.google.android.material.R.style.Theme_MaterialComponents
+                    ))
+                    .setTitle("📊 Short Video Report")
+                    .setMessage(message)
+                    .setPositiveButton("知道了", null)
+                    .create();
+            
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setType(android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+            }
+            
+            dialog.show();
+        });
     }
 
     /**

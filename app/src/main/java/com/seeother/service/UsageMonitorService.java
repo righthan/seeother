@@ -106,6 +106,9 @@ public class UsageMonitorService extends Service {
     }
 
     private void openRecommendedApp() {
+        // 更新推荐时间
+        lastRecommendTime = System.currentTimeMillis();
+        settingsManager.setLastRecommendTime(lastRecommendTime);
         List<RecommendApp> recommendApps = recommendAppDao.getAllApps();
         if (recommendApps.isEmpty()) return;
 
@@ -158,6 +161,9 @@ public class UsageMonitorService extends Service {
     }
 
     private void openRecommendedLink() {
+        // 更新推荐时间
+        lastRecommendTime = System.currentTimeMillis();
+        settingsManager.setLastRecommendTime(lastRecommendTime);
         String randomLink = linkManager.getRandomLink();
         if (randomLink != null) {
             try {
@@ -210,9 +216,6 @@ public class UsageMonitorService extends Service {
                             if (linkManager.shouldOpenLink()) {
                                 openRecommendedLink();
                             } else {
-                            // 更新推荐时间
-                            lastRecommendTime = System.currentTimeMillis();
-                            settingsManager.setLastRecommendTime(lastRecommendTime);
                                 openRecommendedApp();
                             }
                         }, 100); // 延迟100ms，确保应用已经打开

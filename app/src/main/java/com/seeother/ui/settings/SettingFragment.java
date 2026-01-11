@@ -42,6 +42,7 @@ public class SettingFragment extends PreferenceFragmentCompat
 
     private EditTextPreference pauseDurationPref;
     private EditTextPreference popupThresholdPref;
+    private EditTextPreference recommendIntervalPref;
     private SwitchPreferenceCompat hideFromRecentPref;
 
     @Override
@@ -79,6 +80,7 @@ public class SettingFragment extends PreferenceFragmentCompat
         popupThresholdPref = findPreference("popup_threshold_seconds");
 
         // 应用行为相关
+        recommendIntervalPref = findPreference("recommend_interval_minutes");
         hideFromRecentPref = findPreference("hide_from_recent");
     }
 
@@ -195,6 +197,26 @@ public class SettingFragment extends PreferenceFragmentCompat
                     }
                     // 更新summary显示
                     popupThresholdPref.setSummary("当前设置：" + seconds + " 秒");
+                    return true;
+                } catch (NumberFormatException e) {
+                    Toast.makeText(requireContext(), "请输入有效的数字", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        }
+
+        // 推荐间隔验证（1-999分钟）
+        if (recommendIntervalPref != null) {
+            recommendIntervalPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String value = newValue.toString().trim();
+                try {
+                    int minutes = Integer.parseInt(value);
+                    if (minutes < 1 || minutes > 999) {
+                        Toast.makeText(requireContext(), "请输入1-999之间的数字", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    // 更新summary显示
+                    recommendIntervalPref.setSummary("当前设置：" + minutes + " 分钟");
                     return true;
                 } catch (NumberFormatException e) {
                     Toast.makeText(requireContext(), "请输入有效的数字", Toast.LENGTH_SHORT).show();
@@ -404,6 +426,15 @@ public class SettingFragment extends PreferenceFragmentCompat
                 value = "60";  // 默认值
             }
             popupThresholdPref.setSummary("当前设置：" + value + " 秒");
+        }
+
+        // 更新推荐间隔设置的summary
+        if (recommendIntervalPref != null) {
+            String value = recommendIntervalPref.getText();
+            if (value == null || value.isEmpty()) {
+                value = "1";  // 默认值
+            }
+            recommendIntervalPref.setSummary("当前设置：" + value + " 分钟");
         }
     }
 

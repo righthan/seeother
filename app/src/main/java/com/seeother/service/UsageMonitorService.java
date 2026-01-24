@@ -29,6 +29,7 @@ import com.seeother.data.entity.RecommendApp;
 import com.seeother.manager.RecommendLinkManager;
 import com.seeother.manager.SettingsManager;
 import com.seeother.manager.StatisticsManager;
+import com.seeother.utils.GlobalToast;
 import com.seeother.utils.SettingsSecureUtil;
 
 import java.util.Calendar;
@@ -196,6 +197,13 @@ public class UsageMonitorService extends Service {
             
             // 统计少用应用打开次数
             if (monitoredApp != null) {
+                // 显示 GlobalToast 提示，根据暂停状态显示不同信息
+                if (settingsManager.getPauseEnabled()) {
+                    GlobalToast.showShort(this, "SOM: Pausing");
+                } else {
+                    GlobalToast.showShort(this, "SOM: Running");
+                }
+                
                 boolean reachedThreshold = statisticsManager.incrementMonitoredAppOpenCount();
                 if (reachedThreshold) {
                     // 达到阈值，显示打开次数

@@ -27,15 +27,17 @@ public class StatisticsManager {
     private static final String KEY_LAST_MONTH_CHECK = "last_month_check";
     
     // 阈值
-    private static final int MONITORED_APP_THRESHOLD = 100;
-    private static final int SHORT_VIDEO_THRESHOLD = 50;
+    private static final int MONITORED_APP_THRESHOLD = 10;
+    private static final int SHORT_VIDEO_THRESHOLD = 10;
     
     private final SharedPreferences preferences;
     private final Context context;
+    private final SettingsManager settingsManager;
 
     public StatisticsManager(Context context) {
         this.context = context;
         this.preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        this.settingsManager = new SettingsManager(context);
         checkAndResetIfNeeded();
     }
 
@@ -101,8 +103,9 @@ public class StatisticsManager {
         
         Log.d(TAG, "少用应用打开次数: " + currentCount);
         
-        // 每达到100次返回true
-        if (currentCount % MONITORED_APP_THRESHOLD == 0) {
+        // 每达到设置的阈值返回true
+        int threshold = settingsManager.getMonitoredAppThreshold();
+        if (currentCount % threshold == 0) {
             return true;
         }
         
@@ -136,8 +139,9 @@ public class StatisticsManager {
         
         Log.d(TAG, "短视频浏览次数 - 今天: " + todayCount + ", 本月: " + monthCount);
         
-        // 每达到50次返回true
-        if (monthCount % SHORT_VIDEO_THRESHOLD == 0) {
+        // 每达到设置的阈值返回true
+        int threshold = settingsManager.getShortVideoThreshold();
+        if (monthCount % threshold == 0) {
             return true;
         }
         

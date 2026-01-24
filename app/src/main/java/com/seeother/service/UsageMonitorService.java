@@ -441,6 +441,7 @@ public class UsageMonitorService extends Service {
      * 检查是否应该在打开少用应用时推荐其他应用
      * 条件：1. 开关已启用 2. 暂停功能未启用 3. 当前应用是监控应用 
      * 4. 距离上次推荐时间超过设定阈值
+     * 5. 如果不在勿扰模式，或者开启了勿扰模式推荐应用开关
      *
      * @return true表示应该触发推荐
      */
@@ -458,6 +459,17 @@ public class UsageMonitorService extends Service {
         // 检查当前应用是否为监控应用
         if (monitoredApp == null) {
             return false;
+        }
+
+        // 检查是否在勿扰时段，如果在勿扰时段且未开启勿扰模式推荐开关，则不推荐
+        try {
+            if (SettingsSecureUtil.getInstance().isInDoNotDisturbTime() 
+                    && !settingsManager.isRecommendInDndModeEnabled()) {
+                return false;
+            }
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "SettingsSecureUtil 未初始化，无法检查勿扰模式", e);
+            // 如果无法检查勿扰模式，默认不在勿扰时段
         }
 
         // 检查时间间隔是否足够

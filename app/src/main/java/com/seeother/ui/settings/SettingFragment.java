@@ -44,6 +44,8 @@ public class SettingFragment extends PreferenceFragmentCompat
     private EditTextPreference pauseDurationPref;
     private EditTextPreference popupThresholdPref;
     private EditTextPreference recommendIntervalPref;
+    private EditTextPreference monitoredAppThresholdPref;
+    private EditTextPreference shortVideoThresholdPref;
     private SwitchPreferenceCompat hideFromRecentPref;
 
     @Override
@@ -85,6 +87,8 @@ public class SettingFragment extends PreferenceFragmentCompat
 
         // 应用行为相关
         recommendIntervalPref = findPreference("recommend_interval_minutes");
+        monitoredAppThresholdPref = findPreference("monitored_app_threshold");
+        shortVideoThresholdPref = findPreference("short_video_threshold");
         hideFromRecentPref = findPreference("hide_from_recent");
     }
 
@@ -228,6 +232,44 @@ public class SettingFragment extends PreferenceFragmentCompat
                     }
                     // 更新summary显示
                     recommendIntervalPref.setSummary("当前设置：" + minutes + " 分钟");
+                    return true;
+                } catch (NumberFormatException e) {
+                    Toast.makeText(requireContext(), "请输入有效的数字", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        }
+
+        // 少用应用打开次数阈值验证
+        if (monitoredAppThresholdPref != null) {
+            monitoredAppThresholdPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String value = newValue.toString().trim();
+                try {
+                    int threshold = Integer.parseInt(value);
+                    if (threshold < 1 || threshold > 9999) {
+                        Toast.makeText(requireContext(), "请输入1-9999之间的数字", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    monitoredAppThresholdPref.setSummary("当前设置：" + threshold + " 次");
+                    return true;
+                } catch (NumberFormatException e) {
+                    Toast.makeText(requireContext(), "请输入有效的数字", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        }
+
+        // 短视频浏览次数阈值验证
+        if (shortVideoThresholdPref != null) {
+            shortVideoThresholdPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String value = newValue.toString().trim();
+                try {
+                    int threshold = Integer.parseInt(value);
+                    if (threshold < 1 || threshold > 9999) {
+                        Toast.makeText(requireContext(), "请输入1-9999之间的数字", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    shortVideoThresholdPref.setSummary("当前设置：" + threshold + " 次");
                     return true;
                 } catch (NumberFormatException e) {
                     Toast.makeText(requireContext(), "请输入有效的数字", Toast.LENGTH_SHORT).show();
@@ -446,6 +488,24 @@ public class SettingFragment extends PreferenceFragmentCompat
                 value = "1";  // 默认值
             }
             recommendIntervalPref.setSummary("当前设置：" + value + " 分钟");
+        }
+
+        // 更新少用应用打开次数阈值的summary
+        if (monitoredAppThresholdPref != null) {
+            String value = monitoredAppThresholdPref.getText();
+            if (value == null || value.isEmpty()) {
+                value = "10";  // 默认值
+            }
+            monitoredAppThresholdPref.setSummary("当前设置：" + value + " 次");
+        }
+
+        // 更新短视频浏览次数阈值的summary
+        if (shortVideoThresholdPref != null) {
+            String value = shortVideoThresholdPref.getText();
+            if (value == null || value.isEmpty()) {
+                value = "10";  // 默认值
+            }
+            shortVideoThresholdPref.setSummary("当前设置：" + value + " 次");
         }
     }
 

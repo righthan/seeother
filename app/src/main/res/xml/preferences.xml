@@ -103,6 +103,29 @@
             android:summary="当前设置：%s 分钟"
             android:title="推荐间隔时间（分钟）"
             app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="recommend_in_dnd_mode"
+            android:summary="勿扰时段内也会打开推荐应用"
+            android:title="勿扰模式推荐应用"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue="10"
+            android:inputType="number"
+            android:key="monitored_app_threshold"
+            android:summary="当前设置：%s 次"
+            android:title="少用应用打开次数阈值"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue="10"
+            android:inputType="number"
+            android:key="short_video_threshold"
+            android:summary="当前设置：%s 次"
+            android:title="短视频浏览次数阈值"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
     <!-- 紧急场景 -->

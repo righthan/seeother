@@ -117,6 +117,30 @@ public class SettingsManager {
         return preferences.getString("unshakable_time_periods", "");
     }
 
+    // 勿扰模式推荐应用设置
+    public boolean isRecommendInDndModeEnabled() {
+        return preferences.getBoolean("recommend_in_dnd_mode", false);
+    }
+
+    // 阈值设置
+    public int getMonitoredAppThreshold() {
+        try {
+            String value = preferences.getString("monitored_app_threshold", "10");
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 10;
+        }
+    }
+
+    public int getShortVideoThreshold() {
+        try {
+            String value = preferences.getString("short_video_threshold", "10");
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 10;
+        }
+    }
+
     /**
      * 检查当前时间是否在雷打不动时间段内
      * @return true表示在雷打不动时间段内
